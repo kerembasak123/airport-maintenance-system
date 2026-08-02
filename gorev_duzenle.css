@@ -1,0 +1,146 @@
+/* Ana stil ayarları */
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --warning-color: #f8961e;
+    --danger-color: #f94144;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    background-color: white;
+}
+
+.card.p-4 {
+    padding: 2rem !important;
+}
+
+h1 {
+    color: var(--dark-color);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+/* Buton stilleri */
+.btn {
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Tablo stilleri */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: var(--border-radius);
+    margin-top: 1.5rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+}
+
+.table td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-striped tbody tr:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+/* Alert stilleri */
+.alert {
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+}
+
+.alert-info {
+    background-color: #e7f5ff;
+    color: #1864ab;
+    border-left: 4px solid #4dabf7;
+}
+
+/* Form stilleri */
+form {
+    display: inline-block;
+    margin-left: 0.5rem;
+}
+
+/* Responsive ayarlar */
+@media (max-width: 768px) {
+    .card.p-4 {
+        padding: 1rem !important;
+    }
+    
+    .table th, .table td {
+        padding: 0.5rem;
+    }
+    
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
