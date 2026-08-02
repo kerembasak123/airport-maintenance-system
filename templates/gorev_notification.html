@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yeni Görev Ataması</title>
+</head>
+<body>
+    <h2>Yeni Görev Ataması</h2>
+    <p>Merhaba,</p>
+    <p>Yeni bir görev ataması yapılmıştır:</p>
+    <ul>
+        <li><strong>Cihaz:</strong> {{ cihaz.model }} ({{ cihaz.seri_no }})</li>
+        <li><strong>Tür:</strong> {{ cihaz.tur }}</li>
+        <li><strong>Tekniker:</strong> {{ tekniker.username }}</li>
+        <li><strong>Mühendis:</strong> {{ muhendis.username }}</li>
+        <li><strong>Açıklama:</strong> {{ gorev.aciklama }}</li>
+        <li><strong>Atama Tarihi:</strong> {{ gorev.atama_tarihi|date:"d.m.Y H:i" }}</li>
+        <li><strong>Durum:</strong> {{ gorev.get_durum_display }}</li>
+    </ul>
+    <p>Lütfen gerekli işlemleri yapınız.</p>
+    <p>Terminal Elektronik Sistemleri</p>
+</body>
+</html>

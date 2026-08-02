@@ -1,0 +1,87 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block title %}Görev Listesi{% endblock %}
+
+{% block extra_head %}
+    <link href="{% static 'css/gorevler.css' %}" rel="stylesheet">
+    <style>
+        /* Geri bildirim kutusunu kibarca öne çıkaran ufak stil */
+        .geri-bildirim-text {
+            font-style: italic;
+            color: #4a4a4a;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+    <h1>Görev Listesi</h1>
+    <a href="{% url 'ana_sayfa' %}" class="btn btn-secondary mb-3">← Ana Sayfaya Geri Dön</a>
+
+    {% if user.profile.role == 'muhendis' %}
+        <a href="{% url 'gorev_ata' %}" class="btn btn-primary mb-3">Yeni Görev Ata</a>
+    {% endif %}
+
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Cihaz</th>
+                    <th>Bakım Tarihi</th>
+                    <th>Tekniker</th>
+                    <th><strong>Mühendis</strong></th>
+                    <th>Açıklama</th>
+                    <th>Durum</th>
+                    <th>Geri Bildirim</th> <!-- ✅ Geri Bildirim net şekilde eklendi -->
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gorev in gorevler %}
+                <tr>
+                    <td>{{ gorev.bakim.cihaz }}</td>
+                    <td>{{ gorev.bakim.tarih|date:"d.m.Y" }}</td>
+                    <td>{{ gorev.tekniker.username }}</td>
+                    <td>{{ gorev.muhendis.username }}</td>
+                    <td>{{ gorev.aciklama }}</td>
+                    <td>{{ gorev.get_durum_display }}</td>
+                    <td>
+                        {% if gorev.geri_bildirim %}
+                            <div class="geri-bildirim-text">
+                                {{ gorev.geri_bildirim }}
+                            </div>
+                        {% else %}
+                            <em>-</em>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.profile.role == 'tekniker' and gorev.tekniker == user and gorev.durum != 'tamamlandi' %}
+                            <a href="{% url 'gorev_geri_bildirim' gorev.pk %}" class="btn btn-success btn-sm">Geri Bildirim</a>
+                        {% endif %}
+                        {% if user.profile.role == 'muhendis' and gorev.muhendis == user and gorev.durum != 'tamamlandi' %}
+                            <a href="{% url 'gorev_duzenle' gorev.pk %}" class="btn btn-warning btn-sm">Düzenle</a>
+                            <form method="post" action="{% url 'gorev_sil' gorev.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu görevi silmek istediğinize emin misiniz?')">Sil</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">Görev bulunmamaktadır.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

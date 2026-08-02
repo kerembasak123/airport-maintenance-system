@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Cihaz Düzenle{% endblock %}
+{% block extra_head %}
+<link href="{% static 'css/cihaz_duzenle.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+    <h1>Cihazı Düzenle</h1>
+    <a href="{% url 'cihaz_listesi' %}" class="btn btn-secondary mb-3">← Cihaz Listesine Geri Dön</a>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Kaydet</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cihaz Listesi{% endblock %}
+
+{% block extra_head %}
+    <link href="{% static 'css/cihaz_listesi.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        .qr-reader {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            margin: 20px auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+    <h1>📟 Kayıtlı Cihazlar</h1>
+    <a href="{% url 'ana_sayfa' %}" class="btn btn-secondary mb-3">← Ana Sayfaya Geri Dön</a>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Seri No</th>
+                    <th>Model</th>
+                    <th>Tür</th>
+                    <th>Kurulum Tarihi</th>
+                    <th>Bakım Aralığı</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cihaz in cihazlar %}
+                <tr>
+                    <td>{{ cihaz.seri_no }}</td>
+                    <td>{{ cihaz.model }}</td>
+                    <td>{{ cihaz.tur }}</td>
+                    <td>{{ cihaz.kurulum_tarihi|date:"d.m.Y" }}</td>
+                    <td>{{ cihaz.bakım_aralığı_gun }} gün</td>
+                    <td>
+                        <a href="{% url 'cihaz_bakim_gecmisi' cihaz.pk %}" class="btn btn-info btn-sm">Geçmiş</a>
+                        {% if request.user.profile.role == 'muhendis' %}
+                        <a href="{% url 'cihaz_duzenle' cihaz.pk %}" class="btn btn-warning btn-sm">Düzenle</a>
+                        <a href="{% url 'cihaz_sil' cihaz.pk %}" class="btn btn-danger btn-sm">Sil</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Kayıtlı cihaz bulunamadı.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if request.user.profile.role == 'muhendis' %}
+    <h2 class="mt-4">➕ Yeni Cihaz Ekle</h2>
+
+    <button class="btn btn-primary mb-3" onclick="baslat()">📷 QR Kod ile Doldur</button>
+    <div id="qr-reader" class="qr-reader"></div>
+
+    <form method="post" class="mt-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">💾 Kaydet</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function parseQRData(qrText) {
+        console.log("QR Text:", qrText); // Hata ayıklama
+        const fields = qrText.split(",");
+        const data = {};
+        fields.forEach(item => {
+            const [key, ...valParts] = item.split("=");
+            if (key && valParts.length > 0) {
+                const value = valParts.join("=").trim().replace(/^"|"$/g, '');
+                data[key.trim()] = value;
+            }
+        });
+        console.log("Parsed Data:", data); // Hata ayıklama
+        return data;
+    }
+
+    function baslat() {
+        console.log("QR tarayıcı başlatılıyor..."); // Hata ayıklama
+        const qrElement = document.getElementById("qr-reader");
+        if (!qrElement) {
+            console.error("Hata: qr-reader div'i bulunamadı.");
+            alert("Hata: QR tarayıcı alanı bulunamadı.");
+            return;
+        }
+        qrElement.innerHTML = ""; // Önceki içeriği temizle
+        const qr = new Html5Qrcode("qr-reader");
+
+        // Form alanlarını kontrol et
+        const requiredFields = ['id_seri_no', 'id_model', 'id_tur', 'id_kurulum_tarihi', 'id_bakım_aralığı_gun'];
+        for (const field of requiredFields) {
+            if (!document.getElementById(field)) {
+                console.error(`Hata: ${field} input alanı bulunamadı.`);
+                alert(`Hata: Form alanı ${field} bulunamadı.`);
+                return;
+            }
+        }
+
+        qr.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            (decodedText) => {
+                console.log("QR Kod Okundu:", decodedText); // Hata ayıklama
+                const data = parseQRData(decodedText);
+
+                if (data.seri_no) document.getElementById("id_seri_no").value = data.seri_no;
+                if (data.model) document.getElementById("id_model").value = data.model;
+                if (data.tur) document.getElementById("id_tur").value = data.tur;
+                if (data.kurulum_tarihi) document.getElementById("id_kurulum_tarihi").value = data.kurulum_tarihi;
+                if (data.bakım_aralığı_gun) document.getElementById("id_bakım_aralığı_gun").value = data.bakım_aralığı_gun;
+
+                qr.stop().then(() => {
+                    qrElement.innerHTML = "<p class='alert alert-success'>✔ QR Kod Başarıyla Okundu</p>";
+                }).catch(err => {
+                    console.error("QR durdurma hatası:", err);
+                    alert("QR tarayıcı durdurulurken hata oluştu: " + err);
+                });
+            },
+            (err) => {
+                console.warn("QR tarama hatası:", err);
+            }
+        ).catch(err => {
+            console.error("Kamera başlatma hatası:", err);
+            alert("Kamera açılırken hata oluştu: " + err);
+        });
+    }
+</script>
+{% endblock %}

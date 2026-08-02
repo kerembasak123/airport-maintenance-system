@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Raporlar{% endblock %}
+{% block extra_head %}
+    <link href="{% static 'css/raporlar.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h1>Raporlar</h1>
+    <a href="{% url 'ana_sayfa' %}" class="btn btn-secondary mb-3">← Ana Sayfaya Geri Dön</a>
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Yaklaşan ve Geciken Bakımlar -->
+    <h2>Yaklaşan ve Geciken Bakımlar</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Yaklaşan Bakımlar (7 Gün İçinde)</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Cihaz</th>
+                        <th>Sonraki Bakım Tarihi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cihaz in yaklasan %}
+                    <tr>
+                        <td>{{ cihaz.seri_no }} - {{ cihaz.model }}</td>
+                        <td>{{ cihaz.sonraki_bakim_tarihi|date:"d.m.Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">Yaklaşan bakım bulunmamaktadır.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h3>Geciken Bakımlar</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Cihaz</th>
+                        <th>Sonraki Bakım Tarihi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cihaz in geciken %}
+                    <tr>
+                        <td>{{ cihaz.seri_no }} - {{ cihaz.model }}</td>
+                        <td>{{ cihaz.sonraki_bakim_tarihi|date:"d.m.Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">Geciken bakım bulunmamaktadır.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Görev Özeti -->
+    <h2>Görev Özeti</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                {% if role == 'muhendis' %}
+                    <th>Tekniker</th>
+                {% endif %}
+                <th>Durum</th>
+                <th>Görev Sayısı</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ozet in gorev_ozeti %}
+            <tr>
+                {% if role == 'muhendis' %}
+                    <td>{{ ozet.tekniker__username|default:"Kendi Görevleriniz" }}</td>
+                {% endif %}
+                <td>{{ ozet.durum|title }}</td>
+                <td>{{ ozet.sayi }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if role == 'muhendis' %}3{% else %}2{% endif %}">Görev bulunmamaktadır.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Cihaz Bakım Özeti -->
+    <h2>Cihaz Bakım Özeti</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cihaz</th>
+                <th>Bakım Sayısı</th>
+                <th>Son Bakım Tarihi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ozet in cihaz_bakim_ozeti %}
+            <tr>
+                <td>{{ ozet.cihaz.seri_no }} - {{ ozet.cihaz.model }}</td>
+                <td>{{ ozet.bakim_sayisi }}</td>
+                <td>{{ ozet.son_bakim|date:"d.m.Y"|default:"Yok" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Cihaz bulunmamaktadır.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

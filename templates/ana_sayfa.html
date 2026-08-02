@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ana Sayfa - Terminal Elektronik Sistemleri{% endblock %}
+{% block extra_head %}
+<link href="{% static 'css/anasayfa.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+    <h1>Terminal Elektronik Sistemleri</h1>
+    {% if user.is_authenticated %}
+    <div class="button-group">
+  <a href="{% url 'cihaz_listesi' %}" class="btn btn-primary">
+    <span class="icon">📟</span>
+    <span>Cihazlar</span>
+  </a>
+  <a href="{% url 'bakim_listesi' %}" class="btn btn-primary">
+    <span class="icon">🔧</span>
+    <span>Bakımlar</span>
+  </a>
+  <a href="{% url 'gorev_listesi' %}" class="btn btn-primary">
+    <span class="icon">📋</span>
+    <span>{% if user.profile.role == 'tekniker' %}Görevlerim{% else %}Görevler{% endif %}</span>
+  </a>
+</div>
+
+    <h2>📅 Bakımı Yaklaşan Cihazlar (7 gün içinde)</h2>
+    <ul class="list-group">
+        {% for cihaz in yaklasan %}
+            <li class="list-group-item">
+                {{ cihaz.model }} ({{ cihaz.seri_no }}) → 
+                Sonraki Bakım: {{ cihaz.sonraki_bakim_tarihi|date:"d.m.Y" }}
+            </li>
+        {% empty %}
+            <li class="list-group-item">Bakımı yaklaşan cihaz bulunmamaktadır.</li>
+        {% endfor %}
+    </ul>
+
+    <h2 class="mt-4">⚠️ Bakımı Geciken Cihazlar</h2>
+    <ul class="list-group">
+        {% for cihaz in geciken %}
+            <li class="list-group-item geciken">
+                {{ cihaz.model }} ({{ cihaz.seri_no }}) → 
+                Geciken Tarih: {{ cihaz.sonraki_bakim_tarihi|date:"d.m.Y" }}
+            </li>
+        {% empty %}
+            <li class="list-group-item">Geciken cihaz bulunmamaktadır.</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-info">
+        Lütfen sisteme giriş yapın veya kayıt olun.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

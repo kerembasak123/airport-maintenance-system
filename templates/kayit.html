@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Kayıt Ol{% endblock %}
+{% block extra_head %}
+    <link href="{% static 'css/kayit.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h1>Kayıt Ol</h1>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="{% url 'kayit' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Kayıt Ol</button>
+        <a href="{% url 'giris' %}" class="btn btn-primary ms-2">Giriş Yap</a>
+    </form>
+</div>
+{% endblock %}

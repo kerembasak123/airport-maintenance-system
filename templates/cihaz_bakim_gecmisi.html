@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ cihaz }} - Bakım Geçmişi{% endblock %}
+{% block extra_head %}
+    <link href="{% static 'css/cihaz_bakim_gecmisi.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h1>{{ cihaz }} - Bakım Geçmişi</h1>
+    <a href="{% url 'cihaz_listesi' %}" class="btn btn-secondary mb-3">← Cihaz Listesine Geri Dön</a>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>Açıklama</th>
+                    {% if request.user.profile.role == 'muhendis' %}
+                    <th>İşlem</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for bakim in bakimlar %}
+                <tr>
+                    <td>{{ bakim.tarih|date:"d.m.Y" }}</td>
+                    <td>{{ bakim.aciklama }}</td>
+                    {% if request.user.profile.role == 'muhendis' %}
+                    <td>
+                        <a href="{% url 'bakim_duzenle' bakim.pk %}" class="btn btn-warning btn-sm">Düzenle</a>
+                        <a href="{% url 'bakim_sil' bakim.pk %}" class="btn btn-danger btn-sm">Sil</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if request.user.profile.role == 'muhendis' %}3{% else %}2{% endif %}">
+                        Bu cihaza ait bakım kaydı bulunmamaktadır.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

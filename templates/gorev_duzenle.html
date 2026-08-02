@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Görev Düzenle{% endblock %}
+{% block extra_head %}
+    <link href="{% static 'css/gorev_duzenle.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h1>Görev Düzenle - {{ gorev.bakim.cihaz }}</h1>
+    {% if gorev.durum == 'iptal' %}
+    <div class="alert alert-warning">
+        Bu görev daha önce tekniker tarafından <strong>iptal edildi</strong>. Bilgileri güncelleyip tekrar atayabilirsiniz.
+    </div>
+{% endif %}
+
+    <a href="{% url 'gorev_listesi' %}" class="btn btn-secondary mb-3">← Görev Listesine Geri Dön</a>
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Kaydet</button>
+    </form>
+</div>
+{% endblock %}
